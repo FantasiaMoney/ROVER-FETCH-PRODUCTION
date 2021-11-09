@@ -4,6 +4,7 @@ import "./interfaces/IUniswapV2Router02.sol";
 import "./interfaces/IWETH.sol";
 import "./interfaces/IStake.sol";
 import "./interfaces/ISale.sol";
+import "./interfaces/IWTOKEN.sol";
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
@@ -18,11 +19,11 @@ contract Fetch is Ownable {
   address public WETH;
   address public dexRouter;
   address public tokenSale;
+  IWTOKEN public WTOKEN;
 
   address public stakeAddress;
 
   address public token;
-  address public dexPair;
 
   uint256 public dexSplit = 80;
   uint256 public saleSplit = 20;
@@ -38,16 +39,16 @@ contract Fetch is Ownable {
   * @param _dexRouter             address of Corader DEX
   * @param _stakeAddress          address of claim able stake
   * @param _token                 address of token token
-  * @param _dexPair               address of pool pair
   * @param _tokenSale             address of sale
+  * @param _WTOKEN                address of wtoken
   */
   constructor(
     address _WETH,
     address _dexRouter,
     address _stakeAddress,
     address _token,
-    address _dexPair,
-    address _tokenSale
+    address _tokenSale,
+    address _WTOKEN
     )
     public
   {
@@ -55,8 +56,8 @@ contract Fetch is Ownable {
     dexRouter = _dexRouter;
     stakeAddress = _stakeAddress;
     token = _token;
-    dexPair = _dexPair;
     tokenSale = _tokenSale;
+    WTOKEN = IWTOKEN(_WTOKEN);
   }
 
   // deposit only ETH
@@ -77,74 +78,54 @@ contract Fetch is Ownable {
     _depositFor(receiver);
   }
 
-  // deposit ETH and token without convert
-  function depositETHAndERC20(uint256 tokenAmount) external payable {
+  // deposit only token
+  function depositToken(uint256 tokenAmount) external {
     IERC20(token).safeTransferFrom(msg.sender, address(this), tokenAmount);
     // deposit and stake
     _depositFor(msg.sender);
   }
 
   /**
-  * @dev convert deposited ETH into pool and then stake
+  * @dev convert deposited ETH into wtoken and then stake
   */
   function _depositFor(address receiver) internal {
     // check if token received
     uint256 tokenReceived = IERC20(token).balanceOf(address(this));
-    uint256 ethBalance = address(this).balance;
+    require(tokenReceived > 0, "ZERRO TOKEN AMOUNT");
 
-    require(tokenReceived > 0, "NOT SWAPED");
-    require(ethBalance > 0, "ETH NOT REMAINS");
+    // swap token to wtoken
+    IERC20(token).approve(address(WTOKEN), tokenReceived);
+    WTOKEN.deposit(tokenReceived);
 
-    // convert ETH to WETH
-    IWETH(WETH).deposit.value(ethBalance)();
+    // approve wtoken to stake
+    uint256 wtokenReceived = IERC20(address(WTOKEN)).balanceOf(address(this));
+    require(wtokenReceived == tokenReceived, "Wrong WTOKEN amount");
 
-    // approve tokens to router
-    IERC20(token).approve(dexRouter, tokenReceived);
-    IERC20(WETH).approve(dexRouter, ethBalance);
-
-    // add LD
-    IUniswapV2Router02(dexRouter).addLiquidity(
-        WETH,
-        token,
-        ethBalance,
-        tokenReceived,
-        1,
-        1,
-        address(this),
-        now + 1800
-    );
-
-    // approve pool to stake
-    uint256 poolReceived = IERC20(dexPair).balanceOf(address(this));
-    IERC20(dexPair).approve(stakeAddress, poolReceived);
+    IERC20(address(WTOKEN)).approve(stakeAddress, wtokenReceived);
 
     if(isBurnable){
       // burn percent
-      uint256 burnPool = poolReceived.div(100).mul(burnPercent);
-      uint256 sendToPool = poolReceived.sub(burnPool);
-      IERC20(dexPair).transfer(address(0), burnPool);
-      // deposit received pool in token vault strategy
-      IStake(stakeAddress).stakeFor(sendToPool, receiver);
+      uint256 burnWtoken = wtokenReceived.div(100).mul(burnPercent);
+      uint256 sendToWtoken = wtokenReceived.sub(burnWtoken);
+      IERC20(address(WTOKEN)).transfer(address(0x000000000000000000000000000000000000dEaD), burnWtoken);
+      // deposit received Wtoken in token vault strategy
+      IStake(stakeAddress).stakeFor(sendToWtoken, receiver);
     }else{
-      IStake(stakeAddress).stakeFor(poolReceived, receiver);
+      IStake(stakeAddress).stakeFor(wtokenReceived, receiver);
     }
 
     // send remains and shares back to users
-    sendRemains(stakeAddress, receiver);
+    sendRemains(receiver);
   }
 
 
  /**
  * @dev send remains back to user
  */
- function sendRemains(address stakeAddress, address receiver) internal {
+ function sendRemains(address receiver) internal {
     uint256 tokenRemains = IERC20(token).balanceOf(address(this));
     if(tokenRemains > 0)
        IERC20(token).transfer(receiver, tokenRemains);
-
-    uint256 wethRemains = IERC20(WETH).balanceOf(address(this));
-    if(wethRemains > 0)
-      IERC20(WETH).transfer(receiver, wethRemains);
 
     uint256 ethRemains = address(this).balance;
     if(ethRemains > 0)
@@ -155,11 +136,8 @@ contract Fetch is Ownable {
  * @dev swap ETH to token via DEX and Sale
  */
  function swapETHInput(uint256 input) internal {
-  // determining the portion of the incoming ETH to be converted to the ERC20 Token
-  uint256 conversionPortion = input.mul(505).div(1000);
-
   (uint256 ethTodex,
-   uint256 ethToSale) = calculateToSplit(conversionPortion);
+   uint256 ethToSale) = calculateToSplit(input);
 
   // SPLIT SALE with dex and Sale
   if(ethTodex > 0)
@@ -171,7 +149,7 @@ contract Fetch is Ownable {
 
  // helper for swap via dex
  function swapETHViaDEX(address routerDEX, uint256 amount) internal {
-   // SWAP split % of ETH input to token from pool
+   // SWAP split % of ETH input to token from Wtoken
    address[] memory path = new address[](2);
    path[0] = WETH;
    path[1] = token;
