@@ -338,7 +338,7 @@ describe('Update stakes addresses in fetch', function() {
       assert.notEqual(Number(await stakeSecond.balanceOf(userTwo)), 0)
       // user should receive token shares
       const stakePool = Number(await wtoken.balanceOf(stakeSecond.address))
-      const burnPool = Number(await wtoken.balanceOf("0x0000000000000000000000000000000000000000"))
+      const burnPool = Number(await wtoken.balanceOf("0x000000000000000000000000000000000000dEaD"))
       // stake should receive pool
       assert.notEqual(stakePool, 0)
       // burn address should receive tokens
@@ -380,7 +380,7 @@ describe('DEPOSIT ONLY BNB(ETH)', function() {
       assert.notEqual(Number(await stake.balanceOf(userTwo)), 0)
       // user should receive token shares
       const stakePool = Number(await wtoken.balanceOf(stake.address))
-      const burnPool = Number(await wtoken.balanceOf("0x0000000000000000000000000000000000000000"))
+      const burnPool = Number(await wtoken.balanceOf("0x000000000000000000000000000000000000dEaD"))
       // stake should receive pool
       assert.notEqual(stakePool, 0)
       // burn address should receive tokens
@@ -407,9 +407,6 @@ describe('DEPOSIT ONLY BNB(ETH)', function() {
       const staked = await wtoken.balanceOf(stake.address)
       // staked should be more than 0
       assert.isTrue(staked > 0)
-      // clear user balance
-      await token.transfer(userOne, await token.balanceOf(userTwo), {from:userTwo})
-      assert.equal(await token.balanceOf(userTwo), 0)
 
       await timeMachine.advanceTimeAndBlock(stakeDuration)
       // get user shares
