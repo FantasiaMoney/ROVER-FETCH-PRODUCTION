@@ -413,30 +413,6 @@ contract('Stake', function([userOne, userTwo, userThree]) {
       assert.equal(Number(userOneEarned), Number(await token.balanceOf(userOne)))
       assert.equal(Number(userTwoEarned), Number(await token.balanceOf(userTwo)))
     })
-
-    it('Destributor can rescue rewards', async function() {
-      // stake
-      const toStake = await pair.balanceOf(userOne)
-      await pair.approve(stake.address, toStake)
-      await stake.stake(toStake)
-      await stake.exit()
-      // send some remains
-      await token.transfer(stake.address, 100);
-      assert.isTrue(await token.balanceOf(stake.address) > 0)
-      await stake.inCaseRewardsStuck()
-      // should burn remains
-      assert.equal(await token.balanceOf(stake.address), 0)
-    })
-
-    it('Not destributor can NOT rescue rewards', async function() {
-      // stake
-      const toStake = await pair.balanceOf(userOne)
-      await pair.approve(stake.address, toStake)
-      await stake.stake(toStake)
-      await stake.exit()
-      await stake.inCaseRewardsStuck({from:userTwo})
-      .should.be.rejectedWith(EVMRevert)
-    })
   })
   //END
 })

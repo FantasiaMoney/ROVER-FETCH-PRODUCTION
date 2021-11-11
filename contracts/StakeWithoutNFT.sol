@@ -203,9 +203,4 @@ contract StakeWithoutNFT is TokenWrapper, RewardsDistributionRecipient {
         periodFinish = block.timestamp.add(DURATION);
         emit RewardAdded(reward);
     }
-
-    // for case if rewards stuck rewards distribution can move rewards to new contract
-    function inCaseRewardsStuck() external onlyRewardsDistribution {
-      rewardsToken.transfer(rewardsDistribution, rewardsToken.balanceOf(address(this)));
-    }
 }

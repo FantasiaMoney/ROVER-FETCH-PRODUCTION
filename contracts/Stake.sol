@@ -220,12 +220,6 @@ contract Stake is TokenWrapper, RewardsDistributionRecipient {
         emit RewardAdded(reward);
     }
 
-    // for case if rewards stuck rewards distribution can move rewards to new contract
-    function inCaseRewardsStuck() external onlyRewardsDistribution {
-      rewardsToken.transfer(rewardsDistribution, rewardsToken.balanceOf(address(this)));
-    }
-
-
     // NFT Progarm
 
     function claimNFT(uint256 _nftIndex) external {
