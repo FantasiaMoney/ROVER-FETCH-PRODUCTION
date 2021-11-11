@@ -13,6 +13,8 @@
 5) Enable/disable burn in fetch.
 
 6) Fetch with split 20% SALE and 80% DEX (can be changed).
+
+7) Remove inCaseRewardsStuck in stake
 ```
 
 
