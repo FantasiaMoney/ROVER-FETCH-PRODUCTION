@@ -720,8 +720,8 @@ contract TOKEN is Context, IERC20, Ownable {
     uint256 private _rTotal = (MAX - (MAX % _tTotal));
     uint256 private _tFeeTotal;
 
-    string private _name = "CoTrader";
-    string private _symbol = "COT";
+    string private _name = "ROV";
+    string private _symbol = "ROV";
     uint8 private _decimals = 9;
 
     uint256 public _taxFee = 5;
