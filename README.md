@@ -15,6 +15,8 @@
 6) Fetch with split 20% SALE and 80% DEX (can be changed).
 
 7) Remove inCaseRewardsStuck in stake
+
+8) Initial total supply 1000000000 * 100 * 10**6 * 10**9
 ```
 
 
