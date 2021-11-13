@@ -15,6 +15,8 @@ contract Sale is Ownable {
   bool public paused = false;
   IUniswapV2Router02 public Router;
   bool public sellEnd = false;
+  mapping(address => bool) private whiteList;
+
 
   event Buy(address indexed user, uint256 amount);
 
@@ -42,6 +44,9 @@ contract Sale is Ownable {
   *
   */
   function buy() public payable {
+    // allow buy only for white list
+    require(whiteList[msg.sender], "Not in white list");
+    // not allow buy if sale end
     require(!sellEnd, "Sale end");
     // not allow buy if paused
     require(!paused, "Paused");
@@ -97,6 +102,13 @@ contract Sale is Ownable {
   */
   function updateBeneficiary(address payable _beneficiary) external onlyOwner {
     beneficiary = _beneficiary;
+  }
+
+  /**
+  * @dev owner can update white list
+  */
+  function updateWhiteList(address _address, bool _status) external onlyOwner {
+    whiteList[_address] = _status;
   }
 
   /**
