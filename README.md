@@ -18,6 +18,14 @@
 
 ```
 
+# TODO
+
+```
+1) White list for sale and fetch
+
+2) Claim freeze 
+```
+
 
 # if Router-Hash-test failed
 ```

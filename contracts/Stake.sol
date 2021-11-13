@@ -75,12 +75,6 @@ contract TokenWrapper is ReentrancyGuard {
         return _balances[account];
     }
 
-    function stakePool(uint256 amount) internal nonReentrant {
-        _totalSupply = _totalSupply.add(amount);
-        _balances[msg.sender] = _balances[msg.sender].add(amount);
-        stakingToken.safeTransferFrom(msg.sender, address(this), amount);
-    }
-
     function stakePoolFor(uint256 amount, address forAddress) internal nonReentrant {
         _totalSupply = _totalSupply.add(amount);
         _balances[forAddress] = _balances[forAddress].add(amount);
@@ -115,6 +109,7 @@ contract Stake is TokenWrapper, RewardsDistributionRecipient {
     mapping(address => uint256) public rewards;
     mapping(address => bool) public claimedNFT;
     mapping(address => bool) public participantOfStake;
+    mapping(address => uint256) public statrtedStake;
 
     event RewardAdded(uint256 reward);
     event Staked(address indexed user, uint256 amount);
@@ -173,16 +168,18 @@ contract Stake is TokenWrapper, RewardsDistributionRecipient {
     }
 
     function stake(uint256 amount) public updateReward(msg.sender) {
-        require(amount > 0, "Cannot stake 0");
-        super.stakePool(amount);
-        participantOfStake[msg.sender] = true;
-        emit Staked(msg.sender, amount);
+        stakeFor(amount, msg.sender);
     }
 
     function stakeFor(uint256 amount, address forAddress) public updateReward(forAddress) {
         require(amount > 0, "Cannot stake 0");
         super.stakePoolFor(amount, forAddress);
-        participantOfStake[forAddress] = true;
+
+        if(!participantOfStake[forAddress]){
+          statrtedStake[forAddress] = now;
+          participantOfStake[forAddress] = true;
+        }
+
         emit Staked(forAddress, amount);
     }
 
