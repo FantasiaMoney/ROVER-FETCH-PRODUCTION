@@ -95,6 +95,17 @@ contract('Sale-test', function([userOne, userTwo, userThree]) {
     })
   })
 
+  describe('Update white list', function() {
+    it('Owner can call updateWhiteList', async function() {
+      await sale.updateWhiteList(userOne, false)
+      assert.equal(await sale.whiteList(userOne), false)
+    })
+
+    it('Not owner can not call updateWhiteList', async function() {
+      await sale.updateWhiteList(userOne, false, { from:userTwo })
+      .should.be.rejectedWith(EVMRevert)
+    })
+  })
 
   describe('Update benificiary', function() {
     it('Not owner can not call updateBeneficiary', async function() {

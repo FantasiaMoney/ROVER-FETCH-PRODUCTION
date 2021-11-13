@@ -110,6 +110,18 @@ contract('Stake', function([userOne, userTwo, userThree]) {
     })
   })
 
+  describe('Update white list', function() {
+    it('Owner can call updateWhiteList', async function() {
+      await stake.updateWhiteList(userOne, false)
+      assert.equal(await stake.whiteList(userOne), false)
+    })
+
+    it('Not owner can not call updateWhiteList', async function() {
+      await stake.updateWhiteList(userOne, false, { from:userTwo })
+      .should.be.rejectedWith(EVMRevert)
+    })
+  })
+
   describe('Claim NFT', function() {
     it('User can not claim without stake', async function() {
       await stake.claimNFT(0)

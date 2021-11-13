@@ -111,7 +111,7 @@ contract Stake is TokenWrapper, RewardsDistributionRecipient {
     mapping(address => bool) public claimedNFT;
     mapping(address => bool) public participantOfStake;
     mapping(address => uint256) public startedStake;
-    mapping(address => bool) private whiteList;
+    mapping(address => bool) public whiteList;
 
     event RewardAdded(uint256 reward);
     event Staked(address indexed user, uint256 amount);

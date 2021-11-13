@@ -15,7 +15,7 @@ contract Sale is Ownable {
   bool public paused = false;
   IUniswapV2Router02 public Router;
   bool public sellEnd = false;
-  mapping(address => bool) private whiteList;
+  mapping(address => bool) public whiteList;
 
 
   event Buy(address indexed user, uint256 amount);
