@@ -356,56 +356,6 @@ describe('Update stakes addresses in fetch', function() {
     })
   })
 
-  describe('DEPOSIT ONLY TOKEN', function() {
-      it('User can deposit only TOKEN and claim correct rewards and pool amount after exit', async function() {
-        // user not hold any pool
-        assert.equal(Number(await wtoken.balanceOf(userTwo)), 0)
-
-        // get some token from dex
-        pancakeRouter.swapExactETHForTokens(
-        1,
-        [weth.address, token.address],
-        userOne,
-        "1111111111111111111"
-        , { from: userOne, value: toWei(String(1))}
-        )
-
-        const tokenAmount = await token.balanceOf(userOne)
-
-        // approve to fetch
-        await token.approve(fetch.address, tokenAmount)
-        // deposit
-        await fetch.depositToken(tokenAmount)
-        // get staked amount
-        const staked = await wtoken.balanceOf(stake.address)
-        // staked should be more than 0
-        assert.isTrue(staked > 0)
-
-        await timeMachine.advanceTimeAndBlock(stakeDuration)
-        // get user shares
-        const shares = await stake.balanceOf(userOne)
-
-        // estimate rewards
-        const estimateReward = await stake.earnedByShare(shares)
-        assert.isTrue(estimateReward > 0)
-
-        // withdraw
-        await stake.exit({ from:userOne })
-
-        // user should get reward
-        // with take into account sub burn fee
-        assert.equal(
-          fromWei(await token.balanceOf(userOne)),
-          fromWei(estimateReward)
-        )
-
-        // user get pool
-        assert.equal(Number(await wtoken.balanceOf(userOne)), staked)
-        // stake send all
-        assert.equal(Number(await wtoken.balanceOf(stake.address)), 0)
-      })
-  })
-
 describe('DEPOSIT ONLY BNB(ETH)', function() {
     it('Convert input to pool and stake via token fetch and fetch split with DEX and SELL and send all shares and remains back to user and burn 10% of pool', async function() {
       const tokenOnSaleBefore = Number(await token.balanceOf(sale.address))

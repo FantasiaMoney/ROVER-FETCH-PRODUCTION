@@ -60,7 +60,7 @@ contract Fetch is Ownable {
     WTOKEN = IWTOKEN(_WTOKEN);
   }
 
-  // deposit only ETH
+
   function deposit() external payable {
     require(msg.value > 0, "zerro eth");
     // swap ETH
@@ -69,7 +69,7 @@ contract Fetch is Ownable {
     _depositFor(msg.sender);
   }
 
-  // deposit only ETH for a certain address
+
   function depositFor(address receiver) external payable {
     require(msg.value > 0, "zerro eth");
     // swap ETH
@@ -78,12 +78,6 @@ contract Fetch is Ownable {
     _depositFor(receiver);
   }
 
-  // deposit only token
-  function depositToken(uint256 tokenAmount) external {
-    IERC20(token).safeTransferFrom(msg.sender, address(this), tokenAmount);
-    // deposit and stake
-    _depositFor(msg.sender);
-  }
 
   /**
   * @dev convert deposited ETH into wtoken and then stake
