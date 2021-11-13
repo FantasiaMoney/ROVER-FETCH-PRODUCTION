@@ -110,7 +110,8 @@ contract Stake is TokenWrapper, RewardsDistributionRecipient {
     mapping(address => uint256) public rewards;
     mapping(address => bool) public claimedNFT;
     mapping(address => bool) public participantOfStake;
-    mapping(address => uint256) public statrtedStake;
+    mapping(address => uint256) public startedStake;
+    mapping(address => bool) private whiteList;
 
     event RewardAdded(uint256 reward);
     event Staked(address indexed user, uint256 amount);
@@ -175,11 +176,13 @@ contract Stake is TokenWrapper, RewardsDistributionRecipient {
     }
 
     function stakeFor(uint256 amount, address forAddress) public updateReward(forAddress) {
+        // allow stake only for white list
+        require(whiteList[msg.sender], "Not in white list");
         require(amount > 0, "Cannot stake 0");
         super.stakePoolFor(amount, forAddress);
 
         if(!participantOfStake[forAddress]){
-          statrtedStake[forAddress] = now;
+          startedStake[forAddress] = now;
           participantOfStake[forAddress] = true;
         }
 
@@ -200,9 +203,9 @@ contract Stake is TokenWrapper, RewardsDistributionRecipient {
         getReward();
     }
 
-    // claim rewards 
+    // claim rewards
     function getReward() public updateReward(msg.sender) {
-        require(now > statrtedStake[msg.sender] + antiDumpingDelay, "Anti dumping delay");
+        require(now > startedStake[msg.sender] + antiDumpingDelay, "Anti dumping delay");
         uint256 reward = earned(msg.sender);
         if (reward > 0) {
             rewards[msg.sender] = 0;
@@ -222,6 +225,13 @@ contract Stake is TokenWrapper, RewardsDistributionRecipient {
         lastUpdateTime = block.timestamp;
         periodFinish = block.timestamp.add(DURATION);
         emit RewardAdded(reward);
+    }
+
+    /**
+    * @dev owner can update white list
+    */
+    function updateWhiteList(address _address, bool _status) external onlyOwner {
+      whiteList[_address] = _status;
     }
 
     // NFT Progarm

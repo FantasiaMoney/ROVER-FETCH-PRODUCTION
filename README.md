@@ -16,14 +16,20 @@
 
 7) Remove inCaseRewardsStuck in stake
 
+8) White list for sale and fetch
+
+9) Claim freeze 
+
 ```
 
 # TODO
 
 ```
+More tests for
+
 1) White list for sale and fetch
 
-2) Claim freeze 
+2) Claim freeze
 ```
 
 

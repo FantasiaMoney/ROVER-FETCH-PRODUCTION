@@ -77,6 +77,11 @@ contract('Sale-test', function([userOne, userTwo, userThree]) {
 
     // send tokens to sale
     await token.transfer(sale.address, await token.balanceOf(userOne))
+
+    // update white list for users
+    await sale.updateWhiteList(userOne, true)
+    await sale.updateWhiteList(userTwo, true)
+    await sale.updateWhiteList(userThree, true)
   }
 
   beforeEach(async function() {

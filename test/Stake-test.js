@@ -28,7 +28,7 @@ const NFTPrice = toWei("1")
 const Beneficiary = "0x6ffFe11A5440fb275F30e0337Fc296f938a287a5"
 
 const stakeDuration = duration.days(30)
-const antiDumpingDelay = duration.days(30)
+const antiDumpingDelay = duration.days(1)
 
 let uniswapV2Factory,
     uniswapV2Router,
@@ -92,6 +92,11 @@ contract('Stake', function([userOne, userTwo, userThree]) {
     // send some tokens to another users
     await token.transfer(userTwo, toWei(String(1)))
     await token.transfer(userThree, toWei(String(1)))
+
+    // update white list for users
+    await stake.updateWhiteList(userOne, true)
+    await stake.updateWhiteList(userTwo, true)
+    await stake.updateWhiteList(userThree, true)
   }
 
   beforeEach(async function() {

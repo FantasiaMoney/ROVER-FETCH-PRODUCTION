@@ -145,9 +145,9 @@ contract('Fetch-test', function([userOne, userTwo, userThree]) {
     const stakeRewards = halfOfRemains
     const saleAmount = halfOfRemains
 
-    token.transfer(stake.address, stakeRewards)
-    stake.setRewardsDistribution(userOne)
-    stake.notifyRewardAmount(stakeRewards)
+    await token.transfer(stake.address, stakeRewards)
+    await stake.setRewardsDistribution(userOne)
+    await stake.notifyRewardAmount(stakeRewards)
 
     // sell
     await token.transfer(sale.address, saleAmount)
@@ -157,6 +157,11 @@ contract('Fetch-test', function([userOne, userTwo, userThree]) {
 
     // transfer ownership from nft to stake
     await nft.transferOwnership(stake.address)
+
+    // update white list for fetch
+    await stake.updateWhiteList(fetch.address, true)
+    await sale.updateWhiteList(fetch.address, true)
+    await stakeSecond.updateWhiteList(fetch.address, true)
   }
 
   beforeEach(async function() {
