@@ -91,12 +91,13 @@ contract TokenWrapper is ReentrancyGuard {
 
 contract Stake is TokenWrapper, RewardsDistributionRecipient {
     // Stake program
-    IERC20 public rewardsToken;
+    IERC20  public rewardsToken;
     uint256 public DURATION;
     uint256 public periodFinish = 0;
     uint256 public rewardRate = 0;
     uint256 public lastUpdateTime;
     uint256 public rewardPerTokenStored;
+    uint256 public antiDumpingDelay;
 
     // NFT program
     INFT public NFT;
@@ -124,7 +125,8 @@ contract Stake is TokenWrapper, RewardsDistributionRecipient {
         uint256 _DURATION,
         uint256 _maxAmountNFTForClaim,
         uint256 _nftPrice,
-        address _nftETHReceiver
+        address _nftETHReceiver,
+        uint256 _antiDumpingDelay
     )
     public TokenWrapper(_stakingToken) Owned(_owner) {
         rewardsToken = IERC20(_rewardsToken);
@@ -133,6 +135,7 @@ contract Stake is TokenWrapper, RewardsDistributionRecipient {
         maxAmountNFTForClaim = _maxAmountNFTForClaim;
         nftPrice = _nftPrice;
         nftETHReceiver = _nftETHReceiver;
+        antiDumpingDelay = _antiDumpingDelay;
     }
 
     modifier updateReward(address account) {
@@ -183,6 +186,7 @@ contract Stake is TokenWrapper, RewardsDistributionRecipient {
         emit Staked(forAddress, amount);
     }
 
+    // withdraw underlying
     function withdraw(uint256 amount) public updateReward(msg.sender) {
         require(amount > 0, "Cannot withdraw 0");
         require(balanceOf(msg.sender) >= amount, "Input more than balance");
@@ -190,12 +194,15 @@ contract Stake is TokenWrapper, RewardsDistributionRecipient {
         emit Withdrawn(msg.sender, amount);
     }
 
+    // withdraw underlying + claim rewards
     function exit() external {
         withdraw(balanceOf(msg.sender));
         getReward();
     }
 
+    // claim rewards 
     function getReward() public updateReward(msg.sender) {
+        require(now > statrtedStake[msg.sender] + antiDumpingDelay, "Anti dumping delay");
         uint256 reward = earned(msg.sender);
         if (reward > 0) {
             rewards[msg.sender] = 0;

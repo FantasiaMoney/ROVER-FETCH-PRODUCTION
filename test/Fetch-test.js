@@ -33,6 +33,7 @@ const NFTPrice = toWei("1")
 const Beneficiary = "0x6ffFe11A5440fb275F30e0337Fc296f938a287a5"
 
 const stakeDuration = duration.years(5)
+const antiDumpingDelay = duration.days(30)
 
 let pancakeFactory,
     pancakeRouter,
@@ -90,7 +91,8 @@ contract('Fetch-test', function([userOne, userTwo, userThree]) {
       duration.days(30),
       100,
       NFTPrice,
-      userOne
+      userOne,
+      antiDumpingDelay
     )
 
     stakeSecond = await Stake.new(
@@ -101,7 +103,8 @@ contract('Fetch-test', function([userOne, userTwo, userThree]) {
       duration.days(30),
       100,
       NFTPrice,
-      userOne
+      userOne,
+      antiDumpingDelay
     )
 
     sale = await Sale.new(

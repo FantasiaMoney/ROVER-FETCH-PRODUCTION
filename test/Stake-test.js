@@ -28,6 +28,7 @@ const NFTPrice = toWei("1")
 const Beneficiary = "0x6ffFe11A5440fb275F30e0337Fc296f938a287a5"
 
 const stakeDuration = duration.days(30)
+const antiDumpingDelay = duration.days(30)
 
 let uniswapV2Factory,
     uniswapV2Router,
@@ -72,7 +73,8 @@ contract('Stake', function([userOne, userTwo, userThree]) {
       stakeDuration,
       100,
       NFTPrice,
-      userOne
+      userOne,
+      antiDumpingDelay
     )
 
     // transfer ownership from nft to stake
