@@ -188,6 +188,13 @@ contract('Sale-test', function([userOne, userTwo, userThree]) {
       )
     })
 
+
+    it('User not in white list can not call function buy', async function() {
+      await sale.updateWhiteList(userTwo, false)
+      await sale.buy({ from:userTwo, value:toWei(String(1)) })
+      .should.be.rejectedWith(EVMRevert)
+    })
+
     it('Sale rate should be same as in DEX ', async function() {
       const saleRate = await sale.getSalePrice(toWei(String(1)))
 

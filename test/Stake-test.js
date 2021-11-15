@@ -267,6 +267,48 @@ contract('Stake', function([userOne, userTwo, userThree]) {
 
 
   describe('Stake', function() {
+    it('User can not claim ahead of anti dumping time', async function() {
+      // stake should not have any pool
+      assert.equal(await pair.balanceOf(stake.address), 0)
+      // amount to stake
+      const toStake = await pair.balanceOf(userOne)
+      assert.isTrue(toStake > 0)
+      // stake
+      await pair.approve(stake.address, toStake)
+      await stake.stake(toStake)
+      // exit
+      await stake.getReward().should.be.rejectedWith(EVMRevert)
+    })
+
+
+    it('User can claim ahead after anti dumping time', async function() {
+      // stake should not have any pool
+      assert.equal(await pair.balanceOf(stake.address), 0)
+      // amount to stake
+      const toStake = await pair.balanceOf(userOne)
+      assert.isTrue(toStake > 0)
+      // stake
+      await pair.approve(stake.address, toStake)
+      await stake.stake(toStake)
+      await timeMachine.advanceTimeAndBlock(antiDumpingDelay + 1)
+      // exit
+      await stake.getReward()
+    })
+
+    it('User can not stake if stake not in white list', async function() {
+      // stake should not have any pool
+      assert.equal(await pair.balanceOf(stake.address), 0)
+      // amount to stake
+      const toStake = await pair.balanceOf(userOne)
+      assert.isTrue(toStake > 0)
+
+      await stake.updateWhiteList(userOne, false)
+
+      // stake
+      await pair.approve(stake.address, toStake)
+      await stake.stake(toStake).should.be.rejectedWith(EVMRevert)
+    })
+
     it('Can be staked and withdrawed', async function() {
       // stake should not have any pool
       assert.equal(await pair.balanceOf(stake.address), 0)
