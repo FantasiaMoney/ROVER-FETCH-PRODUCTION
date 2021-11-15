@@ -18,18 +18,8 @@
 
 8) White list for sale and fetch
 
-9) Claim freeze 
+9) Claim freeze
 
-```
-
-# TODO
-
-```
-More tests for
-
-1) White list for sale and fetch
-
-2) Claim freeze
 ```
 
 
