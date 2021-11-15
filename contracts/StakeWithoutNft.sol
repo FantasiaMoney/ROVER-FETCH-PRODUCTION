@@ -89,7 +89,7 @@ contract TokenWrapper is ReentrancyGuard {
 }
 
 
-contract StakeWityhoutNft is TokenWrapper, RewardsDistributionRecipient {
+contract StakeWithoutNft is TokenWrapper, RewardsDistributionRecipient {
     // Stake program
     IERC20  public rewardsToken;
     uint256 public DURATION;
