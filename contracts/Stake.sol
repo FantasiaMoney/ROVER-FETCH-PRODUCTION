@@ -227,11 +227,14 @@ contract Stake is TokenWrapper, RewardsDistributionRecipient {
         emit RewardAdded(reward);
     }
 
-    /**
-    * @dev owner can update white list
-    */
+  
     function updateWhiteList(address _address, bool _status) external onlyOwner {
       whiteList[_address] = _status;
+    }
+
+
+    function updateAntiDumpingDelay(uint256 _antiDumpingDelay) external onlyOwner {
+      antiDumpingDelay = _antiDumpingDelay;
     }
 
     // NFT Progarm

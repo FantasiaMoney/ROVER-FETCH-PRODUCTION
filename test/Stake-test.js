@@ -122,6 +122,19 @@ contract('Stake', function([userOne, userTwo, userThree]) {
     })
   })
 
+  describe('Update anti dumping delay', function() {
+    it('Owner can call updateAntiDumpingDelay', async function() {
+      assert.notEqual(await stake.antiDumpingDelay(), 0)
+      await stake.updateAntiDumpingDelay(0)
+      assert.equal(await stake.antiDumpingDelay(), 0)
+    })
+
+    it('Not owner can not call updateAntiDumpingDelay', async function() {
+      await stake.updateAntiDumpingDelay(0, { from:userTwo })
+      .should.be.rejectedWith(EVMRevert)
+    })
+  })
+
   describe('Claim NFT', function() {
     it('User can not claim without stake', async function() {
       await stake.claimNFT(0)
