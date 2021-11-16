@@ -8,9 +8,10 @@ import '../dex/interfaces/IUniswapV2Pair.sol';
 import '@openzeppelin/contracts/math/Math.sol';
 import '@openzeppelin/contracts/math/SafeMath.sol';
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import '@openzeppelin/contracts/access/Ownable.sol';
 
 
-contract DEXFormula {
+contract DEXFormula is Ownable {
   using SafeMath for uint256;
 
   IUniswapV2Router02 public Router;
@@ -75,5 +76,9 @@ contract DEXFormula {
     path[1] = to;
     uint256[] memory res = Router.getAmountsOut(fromAmount, path);
     return res[1];
+  }
+
+  function updateRouter(address _Router) external onlyOwner {
+    Router = _Router;
   }
 }
