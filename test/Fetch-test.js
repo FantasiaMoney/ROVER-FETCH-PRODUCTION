@@ -62,8 +62,8 @@ contract('Fetch-test', function([userOne, userTwo, userThree]) {
     wtoken = await WTOKEN.new(token.address)
 
     // exclude router from fee and balance limit
-    await token.excludeFromFee(pancakeRouter.address)
-    await token.excludeFromTransferLimit(pancakeRouter.address)
+    // await token.excludeFromFee(pancakeRouter.address)
+    // await token.excludeFromTransferLimit(pancakeRouter.address)
 
     const halfOfTotalSupply = BigNumber(BigNumber(BigNumber(await token.totalSupply()).dividedBy(2)).integerValue()).toString(10)
 
