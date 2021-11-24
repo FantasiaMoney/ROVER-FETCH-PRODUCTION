@@ -30,8 +30,7 @@ const SplitFormula = artifacts.require('./SplitFormula')
 const url = "https://gateway.pinata.cloud/ipfs/QmNVZdcfwaadBzKkDFfGXtqNdKwEbMsQY5xZJxfSxNcK2i/1/"
 const nftType = ".json"
 const NFTPrice = toWei("1")
-
-const Beneficiary = "0x6ffFe11A5440fb275F30e0337Fc296f938a287a5"
+const MINLDAmount = toWei("600")
 
 const stakeDuration = duration.years(5)
 const antiDumpingDelay = duration.days(30)
@@ -63,10 +62,6 @@ contract('Fetch-test', function([userOne, userTwo, userThree]) {
     token = await TOKEN.new(pancakeRouter.address)
     wtoken = await WTOKEN.new(token.address)
 
-    // exclude router from fee and balance limit
-    // await token.excludeFromFee(pancakeRouter.address)
-    // await token.excludeFromTransferLimit(pancakeRouter.address)
-
     const halfOfTotalSupply = BigNumber(BigNumber(BigNumber(await token.totalSupply()).dividedBy(2)).integerValue()).toString(10)
 
     // add token liquidity to Pancake
@@ -85,7 +80,18 @@ contract('Fetch-test', function([userOne, userTwo, userThree]) {
 
     nft = await NFT.new(10000, userOne, url, nftType)
 
-    splitFormula = await SplitFormula.new()
+    const initialRate = await pancakeRouter.getAmountsOut(
+      1000000000,
+      [token.address, weth.address]
+    )
+
+    splitFormula = await SplitFormula.new(
+      initialRate[1],
+      MINLDAmount,
+      pancakeRouter.address,
+      pair.address,
+      token.address
+    )
 
     stake = await Stake.new(
       userOne,
@@ -175,6 +181,7 @@ contract('Fetch-test', function([userOne, userTwo, userThree]) {
 
 
   describe('INIT', function() {
+
     it('PairHash correct', async function() {
       assert.equal(
         String(await pancakeFactory.pairCodeHash()).toLowerCase(),
@@ -405,6 +412,7 @@ describe('DEPOSIT ONLY BNB(ETH)', function() {
         Number(fromWei(String(stakePool))).toFixed(4),
         Number(fromWei(String(burnPool * 9))).toFixed(4),
       )
+
       // benificiary receive ETH
       assert.isTrue(Number(await web3.eth.getBalance(userOne)) > saleBeneficiaryBefore)
       // sale send tokens

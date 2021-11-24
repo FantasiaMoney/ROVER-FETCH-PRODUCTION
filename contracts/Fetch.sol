@@ -166,8 +166,11 @@ contract Fetch is Ownable {
    view
    returns(uint256 ethTodex, uint256 ethToSale)
  {
-   (ethTodex,
-   ethToSale) = splitFormula.calculateToSplit(ethInput); 
+   (uint256 ethPercentTodex,
+    uint256 ethPercentToSale) = splitFormula.calculateToSplit(ethInput);
+
+   ethTodex = ethInput.div(100).mul(ethPercentTodex);
+   ethToSale = ethInput.div(100).mul(ethPercentToSale);
  }
 
 
@@ -192,5 +195,12 @@ contract Fetch is Ownable {
  */
  function updateBurnStatus(bool _status) external onlyOwner {
    isBurnable = _status;
+ }
+
+ /**
+ * @dev allow owner update splitFormula
+ */
+ function updateSplitFormula(address _splitFormula) external onlyOwner {
+   splitFormula = ISplitFormula(_splitFormula);
  }
 }
