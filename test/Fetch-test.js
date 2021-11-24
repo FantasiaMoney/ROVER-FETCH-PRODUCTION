@@ -25,6 +25,7 @@ const Stake = artifacts.require('./Stake.sol')
 const Fetch = artifacts.require('./Fetch.sol')
 const NFT = artifacts.require('./NFT.sol')
 const Sale = artifacts.require('./Sale.sol')
+const SplitFormula = artifacts.require('./SplitFormula')
 
 const url = "https://gateway.pinata.cloud/ipfs/QmNVZdcfwaadBzKkDFfGXtqNdKwEbMsQY5xZJxfSxNcK2i/1/"
 const nftType = ".json"
@@ -46,7 +47,8 @@ let pancakeFactory,
     fetch,
     nft,
     sale,
-    wtoken
+    wtoken,
+    splitFormula
 
 
 contract('Fetch-test', function([userOne, userTwo, userThree]) {
@@ -82,6 +84,8 @@ contract('Fetch-test', function([userOne, userTwo, userThree]) {
     pair = await UniswapV2Pair.at(pancakePairAddress)
 
     nft = await NFT.new(10000, userOne, url, nftType)
+
+    splitFormula = await SplitFormula.new()
 
     stake = await Stake.new(
       userOne,
@@ -119,7 +123,8 @@ contract('Fetch-test', function([userOne, userTwo, userThree]) {
       stake.address,
       token.address,
       sale.address,
-      wtoken.address
+      wtoken.address,
+      splitFormula.address
     )
 
 

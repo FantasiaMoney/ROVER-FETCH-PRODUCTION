@@ -5,6 +5,7 @@ import "./interfaces/IWETH.sol";
 import "./interfaces/IStake.sol";
 import "./interfaces/ISale.sol";
 import "./interfaces/IWTOKEN.sol";
+import "./interfaces/ISplitFormula.sol";
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
@@ -20,13 +21,11 @@ contract Fetch is Ownable {
   address public dexRouter;
   address public tokenSale;
   IWTOKEN public WTOKEN;
+  ISplitFormula public splitFormula;
 
   address public stakeAddress;
 
   address public token;
-
-  uint256 public dexSplit = 80;
-  uint256 public saleSplit = 20;
 
   uint256 public burnPercent = 10;
 
@@ -41,6 +40,7 @@ contract Fetch is Ownable {
   * @param _token                 address of token token
   * @param _tokenSale             address of sale
   * @param _WTOKEN                address of wtoken
+  * @param _splitFormula          address of split formula
   */
   constructor(
     address _WETH,
@@ -48,7 +48,8 @@ contract Fetch is Ownable {
     address _stakeAddress,
     address _token,
     address _tokenSale,
-    address _WTOKEN
+    address _WTOKEN,
+    address _splitFormula
     )
     public
   {
@@ -58,6 +59,7 @@ contract Fetch is Ownable {
     token = _token;
     tokenSale = _tokenSale;
     WTOKEN = IWTOKEN(_WTOKEN);
+    splitFormula = ISplitFormula(_splitFormula);
   }
 
 
@@ -164,26 +166,10 @@ contract Fetch is Ownable {
    view
    returns(uint256 ethTodex, uint256 ethToSale)
  {
-   ethTodex = ethInput.div(100).mul(dexSplit);
-   ethToSale = ethInput.div(100).mul(saleSplit);
+   (ethTodex,
+   ethToSale) = splitFormula.calculateToSplit(ethInput); 
  }
 
- /**
- * @dev allow owner set new split
- */
- function updateSplit(
-   uint256 _dexSplit,
-   uint256 _saleSplit
- )
-   external
-   onlyOwner
- {
-   uint256 totalPercentage = _dexSplit + _saleSplit;
-   require(totalPercentage == 100, "wrong total split");
-
-   dexSplit = _dexSplit;
-   saleSplit = _saleSplit;
- }
 
  /**
  * @dev allow owner set new stakeAddress contract address
