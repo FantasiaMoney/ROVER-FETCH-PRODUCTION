@@ -47,7 +47,8 @@ let pancakeFactory,
     nft,
     sale,
     wtoken,
-    splitFormula
+    splitFormula,
+    splitFormulaSecond
 
 
 contract('Fetch-test', function([userOne, userTwo, userThree]) {
@@ -86,6 +87,14 @@ contract('Fetch-test', function([userOne, userTwo, userThree]) {
     )
 
     splitFormula = await SplitFormula.new(
+      initialRate[1],
+      MINLDAmount,
+      pancakeRouter.address,
+      pair.address,
+      token.address
+    )
+
+    splitFormulaSecond = await SplitFormula.new(
       initialRate[1],
       MINLDAmount,
       pancakeRouter.address,
@@ -235,6 +244,24 @@ describe('NFT', function() {
    })
  })
 
+ describe('Split formula', function() {
+    it('Not owner can not update split formula', async function() {
+      await fetch.updateSplitFormula(
+        splitFormulaSecond.address,
+        { from:userTwo }
+      ).should.be.rejectedWith(EVMRevert)
+    })
+
+    it('Owner canupdate split formula', async function() {
+      assert.equal(await fetch.splitFormula(), splitFormula.address)
+
+      await fetch.updateSplitFormula(
+        splitFormulaSecond.address
+      )
+
+      assert.equal(await fetch.splitFormula(), splitFormulaSecond.address)
+    })
+})
 
 describe('Update burn status', function() {
     it('Not owner can not call updateBurnStatus', async function() {
