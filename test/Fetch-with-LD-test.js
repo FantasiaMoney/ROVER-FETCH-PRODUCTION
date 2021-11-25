@@ -31,7 +31,7 @@ const LDManager = artifacts.require('./LDManager')
 const url = "https://gateway.pinata.cloud/ipfs/QmNVZdcfwaadBzKkDFfGXtqNdKwEbMsQY5xZJxfSxNcK2i/1/"
 const nftType = ".json"
 const NFTPrice = toWei("1")
-const MINLDAmount = toWei("600")
+const MINLDAmount = toWei("100")
 
 const stakeDuration = duration.years(5)
 const antiDumpingDelay = duration.days(30)
@@ -417,7 +417,21 @@ describe('Update stakes addresses in fetch', function() {
     })
   })
 
-describe('DEPOSIT ONLY BNB(ETH)', function() {
+describe('DEPOSIT with LD from sale', function() {
+  it('', async function() {
+    // deposit
+    console.log("Total LD before deposit ", Number(fromWei(await weth.balanceOf(pair.address))))
+    await fetch.deposit({ from:userTwo, value:toWei(String(10000)) })
+
+    const initialRate = await pancakeRouter.getAmountsOut(
+      1000000000,
+      [token.address, weth.address]
+    )
+
+    console.log("Rate for 1 TOKEN with add LD", Number(initialRate[1]), "ETH wei")
+    console.log("Total LD after ", Number(fromWei(await weth.balanceOf(pair.address))))
+   })
+
     it('Convert input to pool and stake via token fetch and fetch split with DEX and SELL and send all shares and remains back to user and burn 10% of pool', async function() {
       const tokenOnSaleBefore = Number(await token.balanceOf(sale.address))
       const saleBeneficiaryBefore = Number(await web3.eth.getBalance(userOne))

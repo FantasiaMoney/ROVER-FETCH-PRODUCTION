@@ -20,6 +20,8 @@
 
 9) Claim freeze
 
+10) Split sale with LDManager
+
 ```
 
 
