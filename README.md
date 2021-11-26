@@ -12,15 +12,15 @@
 
 5) Enable/disable burn in fetch.
 
-6) Fetch with split 20% SALE and 80% DEX (can be changed).
+6) Fetch with split 20% SALE and 80% DEX (can be changed in splitFormula).
 
 7) Remove inCaseRewardsStuck in stake
 
 8) White list for sale and fetch
 
-9) Claim freeze
+9) antiDumpingDelay in stake (users can not claim a certain period )
 
-10) Split sale with LDManager
+10) Split sale with LDManager (LD manager add LD with ETH and Tokens on his own balance and then burn pool shares)
 
 ```
 
