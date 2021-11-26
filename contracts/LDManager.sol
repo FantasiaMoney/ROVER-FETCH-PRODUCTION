@@ -28,8 +28,8 @@ contract LDManager {
 
   function getTokenPrice(uint256 _ethAmount) public view returns(uint256) {
       address[] memory path = new address[](2);
-      path[0] = address(token);
-      path[1] = Router.WETH();
+      path[0] = Router.WETH();
+      path[1] = address(token);
       uint256[] memory res = Router.getAmountsOut(_ethAmount, path);
       return res[1];
   }

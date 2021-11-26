@@ -107,7 +107,7 @@ contract Fetch is Ownable {
       // deposit received Wtoken in token vault strategy
       IStake(stakeAddress).stakeFor(sendToWtoken, receiver);
     }else{
-      IStake(stakeAddress).stakeFor(wtokenReceived, receiver);
+
     }
 
     // send remains and shares back to users

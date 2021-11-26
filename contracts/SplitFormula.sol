@@ -36,8 +36,8 @@ contract SplitFormula {
     returns(uint256 ethPercentTodex, uint256 ethPercentToSale)
   {
     if(getCurrentPrice() < initialRate){
-      ethPercentTodex = 100;
-      ethPercentToSale = 0;
+      ethPercentTodex = 50;
+      ethPercentToSale = 50;
     }
     else{
      (ethPercentTodex, ethPercentToSale) = calculatePercentToSplit(ethInput);
@@ -55,8 +55,8 @@ contract SplitFormula {
       ethPercentToSale = 50;
     }
     else{
-      ethPercentTodex = 80;
-      ethPercentToSale = 20;
+      ethPercentTodex = 50;
+      ethPercentToSale = 50;
     }
   }
 
