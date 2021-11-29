@@ -32,8 +32,8 @@ const DAI = artifacts.require('./DAI')
 const url = "https://gateway.pinata.cloud/ipfs/QmNVZdcfwaadBzKkDFfGXtqNdKwEbMsQY5xZJxfSxNcK2i/1/"
 const nftType = ".json"
 const NFTPrice = toWei("1")
-const MINLDAmountInDAI = toWei("1000")
-const MAXLDAmountInDAI = toWei("100000")
+const MINLDAmountInDAI = toWei("450")
+const MAXLDAmountInDAI = toWei("1000")
 const DAIRate = toWei(String(1000))
 
 const stakeDuration = duration.years(5)
