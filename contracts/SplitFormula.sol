@@ -1,8 +1,9 @@
 /**
-1 If (LD below $100K) 50%
-2 If (LD below $10K) 25%
-3 If (LD below $1K) 0%
-4 If (price below 1000x) 100%
+
+1 If (price > 1000x) 100% to sale
+2 else if (LD > $100K) 50% to sale
+3 else if (LD > $10K) 25% to sale
+4 else 0% to sale
 */
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
@@ -50,7 +51,7 @@ contract SplitFormula {
   {
     if(getCurrentPrice() >= initialRate.mul(1000)){
       ethPercentTodex = 0;
-      ethPercentToSale = 1000;
+      ethPercentToSale = 100;
     }
     else{
      (ethPercentTodex, ethPercentToSale) = calculatePercentToSplit(ethInput);
@@ -69,21 +70,21 @@ contract SplitFormula {
       ethPercentTodex = 50;
       ethPercentToSale = 50;
     }
-    if(LDAmount >= minLDAmountInDAI){
-      ethPercentTodex = 50;
-      ethPercentToSale = 50;
+    else if(LDAmount >= minLDAmountInDAI){
+      ethPercentTodex = 75;
+      ethPercentToSale = 25;
     }
     else{
-      ethPercentTodex = 50;
-      ethPercentToSale = 50;
+      ethPercentTodex = 100;
+      ethPercentToSale = 0;
     }
   }
 
   function getLDAmountInDAI() public view returns(uint256){
     uint256 wethBalance = IERC20(weth).balanceOf(poolPair);
     address[] memory path = new address[](2);
-    path[0] = DAI;
-    path[1] = weth;
+    path[0] = weth;
+    path[1] = DAI;
     uint256[] memory res = Router.getAmountsOut(wethBalance, path);
     return res[1];
   }
