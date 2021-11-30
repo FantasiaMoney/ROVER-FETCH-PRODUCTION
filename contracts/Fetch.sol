@@ -17,17 +17,26 @@ contract Fetch is Ownable {
 
   using SafeERC20 for IERC20;
   using SafeMath for uint256;
+
   address public WETH;
+
   address public dexRouter;
+
   address public tokenSale;
+
   IWTOKEN public WTOKEN;
+
   ISplitFormula public splitFormula;
 
   address public stakeAddress;
 
   address public token;
 
-  bool public isBurnable = false;
+  uint256 public cutPercent = 2;
+
+  bool public isCutActive = false;
+
+  address public DAOWallet;
 
   /**
   * @dev constructor
@@ -39,6 +48,7 @@ contract Fetch is Ownable {
   * @param _tokenSale             address of sale
   * @param _WTOKEN                address of wtoken
   * @param _splitFormula          address of split formula
+  * @param _DAOWallet             address of DAOWallet
   */
   constructor(
     address _WETH,
@@ -47,7 +57,8 @@ contract Fetch is Ownable {
     address _token,
     address _tokenSale,
     address _WTOKEN,
-    address _splitFormula
+    address _splitFormula,
+    address _DAOWallet
     )
     public
   {
@@ -58,6 +69,7 @@ contract Fetch is Ownable {
     tokenSale = _tokenSale;
     WTOKEN = IWTOKEN(_WTOKEN);
     splitFormula = ISplitFormula(_splitFormula);
+    DAOWallet = _DAOWallet;
   }
 
 
@@ -97,11 +109,10 @@ contract Fetch is Ownable {
 
     IERC20(address(WTOKEN)).approve(stakeAddress, wtokenReceived);
 
-    if(isBurnable){
-      // burn percent
-      uint256 burnWtoken = wtokenReceived.div(100).mul(1);
-      uint256 sendToWtoken = wtokenReceived.sub(burnWtoken);
-      IERC20(address(WTOKEN)).transfer(address(0x000000000000000000000000000000000000dEaD), burnWtoken);
+    if(isCutActive){
+      uint256 cutWtoken = wtokenReceived.div(100).mul(cutPercent);
+      uint256 sendToWtoken = wtokenReceived.sub(cutWtoken);
+      IERC20(address(WTOKEN)).transfer(address(0x000000000000000000000000000000000000dEaD), cutWtoken);
       // deposit received Wtoken in token vault strategy
       IStake(stakeAddress).stakeFor(sendToWtoken, receiver);
     }else{
@@ -179,12 +190,20 @@ contract Fetch is Ownable {
    stakeAddress = _stakeAddress;
  }
 
+ /**
+ * @dev allow owner set burn percent
+ */
+ function updateCutPercent(uint256 _cutPercent) external onlyOwner {
+   require(_cutPercent > 0, "min %");
+   require(_cutPercent <= 5, "max %");
+   cutPercent = _cutPercent;
+ }
 
  /**
  * @dev allow owner enable/disable burn
  */
  function updateBurnStatus(bool _status) external onlyOwner {
-   isBurnable = _status;
+   isCutActive = _status;
  }
 
  /**
@@ -192,5 +211,12 @@ contract Fetch is Ownable {
  */
  function updateSplitFormula(address _splitFormula) external onlyOwner {
    splitFormula = ISplitFormula(_splitFormula);
+ }
+
+ /**
+ * @dev allow owner update DAOWallet
+ */
+ function updateDAOWallet(address _DAOWallet) external onlyOwner {
+   DAOWallet = _DAOWallet;
  }
 }
