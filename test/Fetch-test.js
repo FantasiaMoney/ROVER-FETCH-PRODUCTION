@@ -1,4 +1,4 @@
-// NOT USED 
+// NOT USED
 
 // import { BN, fromWei, toWei } from 'web3-utils'
 // import ether from './helpers/ether'
@@ -330,44 +330,6 @@
 //
 //     })
 //
-//     it('Owner can call updateBurnPercent and fetch now works with new 5% percent', async function() {
-//       // update address
-//       await fetch.updateBurnPercent(5)
-//       // test new stake
-//       // user two not hold any pool before deposit
-//       assert.equal(Number(await wtoken.balanceOf(userTwo)), 0)
-//       // stake don't have any pool yet
-//       assert.equal(Number(await wtoken.balanceOf(stake.address)), 0)
-//       // deposit
-//       await fetch.deposit({ from:userTwo, value:toWei(String(1)) })
-//       // fetch send all pool
-//       assert.equal(Number(await wtoken.balanceOf(fetch.address)), 0)
-//       // fetch send all shares
-//       assert.equal(Number(await stake.balanceOf(fetch.address)), 0)
-//       // fetch send all ETH remains
-//       assert.equal(Number(await web3.eth.getBalance(fetch.address)), 0)
-//       // fetch send all WETH remains
-//       assert.equal(Number(await weth.balanceOf(fetch.address)), 0)
-//       // fetch send all token
-//       assert.equal(Number(await token.balanceOf(fetch.address)), 0)
-//       // user should receive tokens
-//       assert.notEqual(Number(await stake.balanceOf(userTwo)), 0)
-//       // user should receive token shares
-//       const stakePool = Number(await wtoken.balanceOf(stake.address))
-//       const burnPool = Number(await wtoken.balanceOf("0x000000000000000000000000000000000000dEaD"))
-//       // stake should receive pool
-//       assert.notEqual(stakePool, 0)
-//       // burn address should receive tokens
-//       assert.notEqual(burnPool, 0)
-//       // stake should get more tahn burn
-//       assert.isTrue(stakePool > burnPool)
-//       // burn shoukd get 5% now
-//       assert.equal(
-//         Number(fromWei(String(stakePool))).toFixed(4),
-//         Number(fromWei(String(burnPool * 19))).toFixed(4),
-//       )
-//     })
-//   })
 //
 // describe('Update stakes addresses in fetch', function() {
 //     it('Not owner can not call changeStakeAddress', async function() {

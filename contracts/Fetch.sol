@@ -27,8 +27,6 @@ contract Fetch is Ownable {
 
   address public token;
 
-  uint256 public burnPercent = 10;
-
   bool public isBurnable = false;
 
   /**
@@ -101,7 +99,7 @@ contract Fetch is Ownable {
 
     if(isBurnable){
       // burn percent
-      uint256 burnWtoken = wtokenReceived.div(100).mul(burnPercent);
+      uint256 burnWtoken = wtokenReceived.div(100).mul(1);
       uint256 sendToWtoken = wtokenReceived.sub(burnWtoken);
       IERC20(address(WTOKEN)).transfer(address(0x000000000000000000000000000000000000dEaD), burnWtoken);
       // deposit received Wtoken in token vault strategy
@@ -181,14 +179,6 @@ contract Fetch is Ownable {
    stakeAddress = _stakeAddress;
  }
 
- /**
- * @dev allow owner set burn percent
- */
- function updateBurnPercent(uint256 _burnPercent) external onlyOwner {
-   require(_burnPercent > 0, "min %");
-   require(_burnPercent <= 10, "max %");
-   burnPercent = _burnPercent;
- }
 
  /**
  * @dev allow owner enable/disable burn
