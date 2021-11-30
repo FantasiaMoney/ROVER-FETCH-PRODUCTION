@@ -301,6 +301,24 @@ describe('NFT', function() {
     })
 })
 
+
+describe('Update DAO wallet', function() {
+    it('Not owner can not call updateDAOWallet', async function() {
+      await fetch.updateDAOWallet(
+        "0x0000000000000000000000000000000000000000",
+        { from:userTwo }
+      ).should.be.rejectedWith(EVMRevert)
+    })
+
+    it('Owner can call updateDAOWallet', async function() {
+      await fetch.updateDAOWallet("0x0000000000000000000000000000000000000000")
+      assert.equal(
+        await fetch.DAOWallet(),
+        "0x0000000000000000000000000000000000000000"
+      )
+    })
+})
+
 describe('Update burn status', function() {
     it('Not owner can not call updateBurnStatus', async function() {
       const statusBefore = await fetch.isCutActive()
