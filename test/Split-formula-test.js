@@ -121,6 +121,42 @@ contract('Split-formula-test', function([userOne, userTwo, userThree]) {
   })
 
 
+describe('Update MIN, MAX LD and Price', function() {
+    it('Not owner can not call updateMaxPrice', async function() {
+       await splitFormula.updateMaxPrice(1, { from:userTwo })
+       .should.be.rejectedWith(EVMRevert)
+    })
+
+    it('Not owner can not call updateMinLDAmountInDAI', async function() {
+       await splitFormula.updateMinLDAmountInDAI(1, { from:userTwo })
+       .should.be.rejectedWith(EVMRevert)
+    })
+
+    it('Not owner can not call updateMaxLDAmountInDAI', async function() {
+       await splitFormula.updateMaxLDAmountInDAI(1, { from:userTwo })
+       .should.be.rejectedWith(EVMRevert)
+    })
+
+
+    it('Owner can call updateMaxPrice', async function() {
+       assert.notEqual(await splitFormula.maxPrice(), 1)
+       await splitFormula.updateMaxPrice(1)
+       assert.equal(await splitFormula.maxPrice(), 1)
+    })
+
+    it('Owner can call updateMinLDAmountInDAI', async function() {
+       assert.notEqual(await splitFormula.minLDAmountInDAI(), 1)
+       await splitFormula.updateMinLDAmountInDAI(1)
+       assert.equal(await splitFormula.minLDAmountInDAI(), 1)
+    })
+
+    it('Owner can call updateMaxLDAmountInDAI', async function() {
+       assert.notEqual(await splitFormula.maxLDAmountInDAI(), 1)
+       await splitFormula.updateMaxLDAmountInDAI(1)
+       assert.equal(await splitFormula.maxLDAmountInDAI(), 1)
+    })
+})
+
 describe('Split formula', function() {
     it('Should be 100% to dex and 0% to sell', async function() {
        const splitData = await splitFormula.calculateToSplit(toWei("1"))

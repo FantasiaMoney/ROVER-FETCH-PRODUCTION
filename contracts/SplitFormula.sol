@@ -8,9 +8,10 @@
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "./interfaces/IUniswapV2Router02.sol";
 
-contract SplitFormula {
+contract SplitFormula is Ownable {
   using SafeMath for uint256;
 
   IUniswapV2Router02 public Router;
@@ -19,7 +20,7 @@ contract SplitFormula {
   address public weth;
   address public DAI;
 
-  uint256 public initialRate;
+  uint256 public maxPrice;
   uint256 public minLDAmountInDAI;
   uint256 public maxLDAmountInDAI;
 
@@ -34,7 +35,7 @@ contract SplitFormula {
   )
     public
   {
-    initialRate = _initialRate;
+    maxPrice = _initialRate.mul(1000);
     minLDAmountInDAI = _minLDAmountInDAI;
     maxLDAmountInDAI = _maxLDAmountInDAI;
     Router = IUniswapV2Router02(_dexRouter);
@@ -49,7 +50,7 @@ contract SplitFormula {
     view
     returns(uint256 ethPercentTodex, uint256 ethPercentToSale)
   {
-    if(getCurrentPrice() >= initialRate.mul(1000)){
+    if(getCurrentPrice() >= maxPrice){
       ethPercentTodex = 0;
       ethPercentToSale = 100;
     }
@@ -95,5 +96,18 @@ contract SplitFormula {
     path[1] = weth;
     uint256[] memory res = Router.getAmountsOut(1000000000, path);
     return res[1];
+  }
+
+
+  function updateMaxPrice(uint256 _maxPrice) external onlyOwner {
+    maxPrice = _maxPrice;
+  }
+
+  function updateMinLDAmountInDAI(uint256 _minLDAmountInDAI) external onlyOwner {
+    minLDAmountInDAI = _minLDAmountInDAI;
+  }
+
+  function updateMaxLDAmountInDAI(uint256 _maxLDAmountInDAI) external onlyOwner {
+    maxLDAmountInDAI = _maxLDAmountInDAI;
   }
 }
