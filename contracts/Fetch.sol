@@ -112,7 +112,7 @@ contract Fetch is Ownable {
     if(isCutActive){
       uint256 cutWtoken = wtokenReceived.div(100).mul(cutPercent);
       uint256 sendToWtoken = wtokenReceived.sub(cutWtoken);
-      IERC20(address(WTOKEN)).transfer(address(0x000000000000000000000000000000000000dEaD), cutWtoken);
+      IERC20(address(WTOKEN)).transfer(DAOWallet, cutWtoken);
       // deposit received Wtoken in token vault strategy
       IStake(stakeAddress).stakeFor(sendToWtoken, receiver);
     }else{
