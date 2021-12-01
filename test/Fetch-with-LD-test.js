@@ -211,7 +211,7 @@ contract('Fetch-with-LD-test', function([userOne, userTwo, userThree]) {
     await token.transfer(ldManager.address, ldManagerAmount)
 
     // activate burn
-    await fetch.updateBurnStatus(true)
+    await fetch.updateCutStatus(true)
 
     // transfer ownership from nft to stake
     await nft.transferOwnership(stake.address)
@@ -320,10 +320,10 @@ describe('Update DAO wallet', function() {
 })
 
 describe('Update burn status', function() {
-    it('Not owner can not call updateBurnStatus', async function() {
+    it('Not owner can not call updateCutStatus', async function() {
       const statusBefore = await fetch.isCutActive()
 
-      await fetch.updateBurnStatus(
+      await fetch.updateCutStatus(
         false,
         { from:userTwo }
       ).should.be.rejectedWith(EVMRevert)
@@ -331,10 +331,10 @@ describe('Update burn status', function() {
       assert.equal(statusBefore, await fetch.isCutActive())
     })
 
-    it('Owner can call updateBurnStatus', async function() {
+    it('Owner can call updateCutStatus', async function() {
       const statusBefore = await fetch.isCutActive()
 
-      await fetch.updateBurnStatus(false)
+      await fetch.updateCutStatus(false)
 
       assert.notEqual(statusBefore, await fetch.isCutActive())
       assert.equal(await fetch.isCutActive(), false)

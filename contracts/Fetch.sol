@@ -191,7 +191,7 @@ contract Fetch is Ownable {
  }
 
  /**
- * @dev allow owner set burn percent
+ * @dev allow owner set cut percent
  */
  function updateCutPercent(uint256 _cutPercent) external onlyOwner {
    require(_cutPercent > 0, "min %");
@@ -200,9 +200,9 @@ contract Fetch is Ownable {
  }
 
  /**
- * @dev allow owner enable/disable burn
+ * @dev allow owner enable/disable cut
  */
- function updateBurnStatus(bool _status) external onlyOwner {
+ function updateCutStatus(bool _status) external onlyOwner {
    isCutActive = _status;
  }
 
