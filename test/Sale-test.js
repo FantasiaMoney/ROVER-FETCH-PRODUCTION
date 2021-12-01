@@ -95,6 +95,56 @@ contract('Sale-test', function([userOne, userTwo, userThree]) {
     })
   })
 
+
+  describe('Migration', function() {
+    it('Not owner can not call blockMigrate', async function() {
+       await sale.blockMigrate({ from:userTwo })
+       .should.be.rejectedWith(EVMRevert)
+    })
+
+    it('Not owner can not call migrate', async function() {
+       await sale.migrate(
+         userTwo,
+         await token.balanceOf(sale.address),
+         { from:userTwo }
+       )
+       .should.be.rejectedWith(EVMRevert)
+    })
+
+    it('Not owner can not call finish', async function() {
+       await sale.finish({ from:userTwo })
+       .should.be.rejectedWith(EVMRevert)
+    })
+
+    it('Owner can call blockMigrate', async function() {
+       await sale.blockMigrate()
+    })
+
+    it('Owner can call migrate', async function() {
+       assert.notEqual(Number(await token.balanceOf(sale.address)), 0)
+       await sale.migrate(
+         userTwo,
+         await token.balanceOf(sale.address),
+       )
+       assert.equal(Number(await token.balanceOf(sale.address)), 0)
+    })
+
+    it('Owner can not call migrate after blockMigrate', async function() {
+       await sale.blockMigrate()
+       await sale.migrate(
+         userTwo,
+         await token.balanceOf(sale.address)
+       )
+       .should.be.rejectedWith(EVMRevert)
+    })
+
+    it('Owner can call finish', async function() {
+       assert.notEqual(Number(await token.balanceOf(sale.address)), 0)
+       await sale.finish()
+       assert.equal(Number(await token.balanceOf(sale.address)), 0)
+    })
+  })
+
   describe('Update white list', function() {
     it('Owner can call updateWhiteList', async function() {
       await sale.updateWhiteList(userOne, false)

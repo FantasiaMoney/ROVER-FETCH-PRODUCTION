@@ -1,9 +1,11 @@
 import "./interfaces/IUniswapV2Router02.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract LDManager {
+contract LDManager is Ownable {
   IUniswapV2Router02 public Router;
   address public token;
+  bool public endMigrate = false;
 
   constructor(address _Router, address _token) public {
       Router = IUniswapV2Router02(_Router);
@@ -32,6 +34,31 @@ contract LDManager {
       path[1] = address(token);
       uint256[] memory res = Router.getAmountsOut(_ethAmount, path);
       return res[1];
+  }
+
+  /**
+  * @dev owner can block migrate forever
+  */
+  function blockMigrate() external onlyOwner {
+    endMigrate = true;
+  }
+
+  /**
+  * @dev owner can move assets to another sale address or LD manager
+  */
+  function migrate(address _to, uint256 _amount) external onlyOwner {
+     require(!endMigrate, "Migrate finished");
+     IERC20(token).transfer(_to, _amount);
+  }
+
+  /**
+  * @dev owner can move assets to burn
+  */
+  function finish() external onlyOwner {
+     IERC20(token).transfer(
+       address(0x000000000000000000000000000000000000dEaD),
+       IERC20(token).balanceOf(address(this))
+     );
   }
 
   receive() external payable {}

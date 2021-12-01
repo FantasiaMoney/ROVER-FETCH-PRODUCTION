@@ -15,6 +15,7 @@ contract Sale is Ownable {
   bool public paused = false;
   IUniswapV2Router02 public Router;
   bool public sellEnd = false;
+  bool public endMigrate = false;
   mapping(address => bool) public whiteList;
 
 
@@ -109,6 +110,31 @@ contract Sale is Ownable {
   */
   function updateWhiteList(address _address, bool _status) external onlyOwner {
     whiteList[_address] = _status;
+  }
+
+  /**
+  * @dev owner can block migrate forever
+  */
+  function blockMigrate() external onlyOwner {
+    endMigrate = true;
+  }
+
+  /**
+  * @dev owner can move assets to another sale address or LD manager
+  */
+  function migrate(address _to, uint256 _amount) external onlyOwner {
+     require(!endMigrate, "Migrate finished");
+     token.transfer(_to, _amount);
+  }
+
+  /**
+  * @dev owner can move assets to burn
+  */
+  function finish() external onlyOwner {
+     token.transfer(
+       address(0x000000000000000000000000000000000000dEaD),
+       token.balanceOf(address(this))
+     );
   }
 
   /**
