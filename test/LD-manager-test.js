@@ -20,10 +20,8 @@ const UniswapV2Router = artifacts.require('./UniswapV2Router02.sol')
 const UniswapV2Pair = artifacts.require('./UniswapV2Pair.sol')
 const WETH = artifacts.require('./WETH9.sol')
 const TOKEN = artifacts.require('./TOKEN.sol')
-const WTOKEN = artifacts.require('./WTOKEN.sol')
-const Sale = artifacts.require('./Sale.sol')
+const LDManager = artifacts.require('./LDManager')
 
-const Beneficiary = "0x6ffFe11A5440fb275F30e0337Fc296f938a287a5"
 
 let uniswapV2Factory,
     uniswapV2Router,
@@ -31,10 +29,10 @@ let uniswapV2Factory,
     token,
     pair,
     pairAddress,
-    wtoken
+    ldManager
 
 
-contract('WTOKEN', function([userOne, userTwo, userThree]) {
+contract('LD Manager-test', function([userOne, userTwo, userThree]) {
 
   async function deployContracts(){
     // deploy contracts
@@ -42,7 +40,6 @@ contract('WTOKEN', function([userOne, userTwo, userThree]) {
     weth = await WETH.new()
     uniswapV2Router = await UniswapV2Router.new(uniswapV2Factory.address, weth.address)
     token = await TOKEN.new(uniswapV2Router.address)
-    wtoken = await WTOKEN.new(token.address)
 
     // add token liquidity
     await token.approve(uniswapV2Router.address, toWei(String(500)))
@@ -67,39 +64,70 @@ contract('WTOKEN', function([userOne, userTwo, userThree]) {
     pairAddress = await uniswapV2Factory.allPairs(0)
     pair = await UniswapV2Pair.at(pairAddress)
 
+    ldManager = await LDManager.new(
+      uniswapV2Router.address,
+      token.address
+    )
 
-    // exclude WTOKEN from fee and balance limit
-    await token.excludeFromFee(wtoken.address)
-    await token.excludeFromTransferLimit(wtoken.address)
+    // exclude ldManager from fee and balance limit
+    await token.excludeFromFee(ldManager.address)
+    await token.excludeFromTransferLimit(ldManager.address)
+
+    // send tokens to ldManager
+    await token.transfer(ldManager.address, await token.balanceOf(userOne))
   }
 
   beforeEach(async function() {
     await deployContracts()
   })
 
-  describe('WTOKEN', function() {
-    it('Correct deposit', async function() {
-      const toDeposit = await token.balanceOf(userOne)
-      assert.isTrue(Number(toDeposit) > 0)
-      await token.approve(wtoken.address, toDeposit)
-      assert.equal(Number(await wtoken.totalSupply()), 0)
-      await wtoken.deposit(toDeposit)
-      assert.equal(Number(await wtoken.totalSupply()), Number(toDeposit))
-      assert.equal(Number(await wtoken.balanceOf(userOne)), Number(toDeposit))
-      assert.equal(Number(await token.balanceOf(userOne)), 0)
+
+  describe('Migration', function() {
+    it('Not owner can not call blockMigrate', async function() {
+       await ldManager.blockMigrate({ from:userTwo })
+       .should.be.rejectedWith(EVMRevert)
     })
 
-    it('Correct withdarw', async function() {
-      const toDeposit = await token.balanceOf(userOne)
-      assert.isTrue(Number(toDeposit) > 0)
-      await token.approve(wtoken.address, toDeposit)
-      await wtoken.deposit(toDeposit)
-      assert.equal(Number(await wtoken.balanceOf(userOne)), Number(toDeposit))
+    it('Not owner can not call migrate', async function() {
+       await ldManager.migrate(
+         userTwo,
+         await token.balanceOf(ldManager.address),
+         { from:userTwo }
+       )
+       .should.be.rejectedWith(EVMRevert)
+    })
 
-      await wtoken.withdraw(toDeposit)
-      assert.equal(Number(await wtoken.totalSupply()), 0)
-      assert.equal(Number(await wtoken.balanceOf(userOne)), 0)
-      assert.equal(Number(await token.balanceOf(userOne)), Number(toDeposit))
+    it('Not owner can not call finish', async function() {
+       await ldManager.finish({ from:userTwo })
+       .should.be.rejectedWith(EVMRevert)
+    })
+
+    it('Owner can call blockMigrate', async function() {
+       await ldManager.blockMigrate()
+    })
+
+    it('Owner can call migrate', async function() {
+       assert.notEqual(Number(await token.balanceOf(ldManager.address)), 0)
+       await ldManager.migrate(
+         userTwo,
+         await token.balanceOf(ldManager.address),
+       )
+       assert.equal(Number(await token.balanceOf(ldManager.address)), 0)
+    })
+
+    it('Owner can not call migrate after blockMigrate', async function() {
+       await ldManager.blockMigrate()
+       await ldManager.migrate(
+         userTwo,
+         await token.balanceOf(ldManager.address)
+       )
+       .should.be.rejectedWith(EVMRevert)
+    })
+
+    it('Owner can call finish', async function() {
+       assert.notEqual(Number(await token.balanceOf(ldManager.address)), 0)
+       await ldManager.finish()
+       assert.equal(Number(await token.balanceOf(ldManager.address)), 0)
     })
   })
   //END

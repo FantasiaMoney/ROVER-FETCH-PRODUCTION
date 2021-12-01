@@ -102,14 +102,6 @@ contract SaleWithLD is Ownable {
   }
 
   /**
-  * @dev owner can withdraw unused
-  */
-  function withdrawUnused(uint256 _amount) external onlyOwner {
-    token.transfer(owner(), _amount);
-  }
-
-
-  /**
   * @dev owner can update beneficiary
   */
   function updateBeneficiary(address payable _beneficiary) external onlyOwner {

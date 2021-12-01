@@ -22,6 +22,10 @@
 
 10) Split sale with LDManager (LD manager add LD with ETH and Tokens on his own balance and then burn pool shares)
 
+11) Remove withdarw Unused from sale
+
+12) Add finish() and migrate() to sale and LDmanager 
+
 ```
 
 

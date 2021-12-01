@@ -90,13 +90,6 @@ contract Sale is Ownable {
     paused = false;
   }
 
-  /**
-  * @dev owner can withdraw unused
-  */
-  function withdrawUnused(uint256 _amount) external onlyOwner {
-    token.transfer(owner(), _amount);
-  }
-
 
   /**
   * @dev owner can update beneficiary

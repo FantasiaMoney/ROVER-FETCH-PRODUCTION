@@ -169,30 +169,6 @@ contract('Sale-test', function([userOne, userTwo, userThree]) {
     })
   })
 
-  describe('Withdraw unused', function() {
-    it('Not owner can not call withdrawUnused', async function() {
-      const saleBalance = await token.balanceOf(sale.address)
-      assert.isTrue(saleBalance > 0)
-
-      await sale.withdrawUnused(saleBalance, { from:userTwo })
-      .should.be.rejectedWith(EVMRevert)
-
-      assert.equal(Number(await token.balanceOf(sale.address)), Number(saleBalance))
-    })
-
-    it('Owner can call withdrawUnused and get unused tokens', async function() {
-      const saleBalance = await token.balanceOf(sale.address)
-      // reset owner balance
-      assert.isTrue(saleBalance > 0)
-      assert.equal(await token.balanceOf(userOne), 0)
-
-      await sale.withdrawUnused(saleBalance)
-      // owner should receive all tokens from sale
-      assert.equal(Number(await token.balanceOf(userOne)), Number(saleBalance))
-      assert.equal(await token.balanceOf(sale.address), 0)
-    })
-  })
-
   describe('Token sale', function() {
     it('Not Owner can NOT pause and unpause sale ', async function() {
       await sale.pause({ from:userTwo })
