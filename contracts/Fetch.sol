@@ -34,7 +34,7 @@ contract Fetch is Ownable {
 
   uint256 public cutPercent = 2;
 
-  bool public isCutActive = false;
+  bool public isCutActive = true;
 
   address public DAOWallet;
 

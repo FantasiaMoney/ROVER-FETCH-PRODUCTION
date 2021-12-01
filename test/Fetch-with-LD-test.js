@@ -210,9 +210,6 @@ contract('Fetch-with-LD-test', function([userOne, userTwo, userThree]) {
     // ld manager
     await token.transfer(ldManager.address, ldManagerAmount)
 
-    // activate burn
-    await fetch.updateCutStatus(true)
-
     // transfer ownership from nft to stake
     await nft.transferOwnership(stake.address)
 
