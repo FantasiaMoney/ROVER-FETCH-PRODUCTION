@@ -1,30 +1,42 @@
 # Description
 ```
-0) SafeMoon based token.
+NFTs with stake (for case if we will want this)
 
 1) Only Stake contract can mint new NFT.
 
 2) User can get NFT in 2 ways. Via get stake rewards, one time per address (proof of stake) or just buy from stake via ETH(BNB or MATIC dependse on chain).
 
-3) SF token with ExcludedFromTransferLimit for manage stake limit and allow stake transfer to user more than max limit. for case if user gained more than max limit in stake duration.
 
-4) Burn % of pool share in fetch deposits.
+Stake/Fetch/Sale
 
-5) Enable/disable burn in fetch.
+1) Cut % of pool share (or WTOKEN) in fetch deposits.
 
-6) Fetch with split 20% SALE and 80% DEX (can be changed in splitFormula).
+2) Enable/disable cut in fetch
 
-7) Remove inCaseRewardsStuck in stake
+3) Change able commision for cut in from 1% to 5%
 
-8) White list for sale and fetch
+4) Fetch with split SALE and DEX (can be changed in splitFormula).
 
-9) antiDumpingDelay in stake (users can not claim a certain period )
+5) White list for sale and stake (users can not use sale or stake directly)
 
-10) Split sale with LDManager (LD manager add LD with ETH and Tokens on his own balance and then burn pool shares)
+6) antiDumpingDelay in stake (users can not claim a certain period)
 
-11) Remove withdarw Unused from sale
+7) Split sale with LDManager (LD manager add LD with ETH and Tokens on his own balance and then burn pool shares)
 
-12) Add finish() and migrate() to sale and LDmanager 
+8) Add finish (burn remains tokens) in sale and LD manager
+
+9) Add migrate() to sale and LDmanager and vice versa, or to new versions of sale or LD manager
+
+10) Remove withdarw unused from sale
+
+11) Remove inCaseRewardsStuck in stake
+
+
+Safemoon token
+
+3) We have SF based based token, we only add ExcludedFromTransferLimit for manage stake limit and allow stake transfer to user more than max limit.
+
+For case if user gained more than max limit transfer in stake duration.
 
 ```
 
