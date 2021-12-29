@@ -36,6 +36,8 @@ contract Fetch is Ownable {
 
   bool public isCutActive = true;
 
+  bool public isAllowDeposit = true;
+
   address public DAOWallet;
 
   /**
@@ -83,6 +85,7 @@ contract Fetch is Ownable {
 
 
   function depositFor(address receiver) external payable {
+    require(isAllowDeposit, "deposit disabled");
     require(msg.value > 0, "zerro eth");
     // swap ETH
     swapETHInput(msg.value);
@@ -109,19 +112,31 @@ contract Fetch is Ownable {
 
     IERC20(address(WTOKEN)).approve(stakeAddress, wtokenReceived);
 
+    // cut commision
     if(isCutActive){
       uint256 cutWtoken = wtokenReceived.div(100).mul(cutPercent);
       uint256 sendToWtoken = wtokenReceived.sub(cutWtoken);
       IERC20(address(WTOKEN)).transfer(DAOWallet, cutWtoken);
-      // deposit received Wtoken in token vault strategy
       IStake(stakeAddress).stakeFor(sendToWtoken, receiver);
-    }else{
-
+    }
+    // stake withou cut
+    else{
+      IStake(stakeAddress).stakeFor(wtokenReceived, receiver);
     }
 
     // send remains and shares back to users
     sendRemains(receiver);
-  }
+ }
+
+ function convertFor(address receiver) external payable {
+   require(msg.value > 0, "zerro eth");
+   // swap ETH
+   swapETHInput(msg.value);
+   // send tokens back
+   uint256 tokenReceived = IERC20(token).balanceOf(address(this));
+   require(tokenReceived > 0, "not swapped");
+   IERC20(token).transfer(receiver, tokenReceived);
+ }
 
 
  /**
@@ -218,5 +233,12 @@ contract Fetch is Ownable {
  */
  function updateDAOWallet(address _DAOWallet) external onlyOwner {
    DAOWallet = _DAOWallet;
+ }
+
+ /**
+ * @dev allow owner update DAOWallet
+ */
+ function updateisAllowDeposit(bool _isAllowDeposit) external onlyOwner {
+   isAllowDeposit = _isAllowDeposit;
  }
 }

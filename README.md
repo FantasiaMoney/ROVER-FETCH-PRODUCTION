@@ -31,6 +31,10 @@ Stake/Fetch/Sale
 
 11) Remove inCaseRewardsStuck in stake
 
+12) Add convertFor for case deposit without stake
+
+13) Add isAllowDeposit
+
 
 Safemoon token
 
